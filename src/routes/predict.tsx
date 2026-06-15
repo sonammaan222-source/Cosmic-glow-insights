@@ -74,7 +74,7 @@ function PredictPage() {
     if (step === 1) {
       if (!form.dob) return toast.error("Please pick your date of birth.");
       if (!form.unknownTime && !form.time) return toast.error("Add a time of birth or mark it unknown.");
-      if (!form.birthCity.trim()) return toast.error("Please add your birth city.");
+      if (!form.birthCity?.trim()) return toast.error("Please add your birth city.");
     }
     setStep((s) => Math.min(s + 1, STEPS.length - 1));
   };
