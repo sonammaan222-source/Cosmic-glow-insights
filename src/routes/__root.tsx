@@ -84,13 +84,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "Personalized astrology and numerology insights drawn from your birth details. Discover your zodiac, life path, and cosmic guidance.",
       },
-      { property: "og:title", content: "Cosmic Insight — Astrology & Numerology" },
+      { property: "og:title", content: "Cosmic Insight — Astrology & Numerology Readings" },
       {
         property: "og:description",
         content: "Discover what the universe reveals about you — birth-based readings.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Cosmic Insight — Astrology & Numerology Readings" },
+      { name: "description", content: "Cosmic Insight generates personalized astrology and numerology insights from your birth details." },
+      { property: "og:description", content: "Cosmic Insight generates personalized astrology and numerology insights from your birth details." },
+      { name: "twitter:description", content: "Cosmic Insight generates personalized astrology and numerology insights from your birth details." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/0e4b6485-3c9c-46d0-8940-8bc78fcf8fdc/id-preview-11b70679--bba4bb75-68d4-4ba0-ac78-e8ee003deb73.lovable.app-1781607021304.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/0e4b6485-3c9c-46d0-8940-8bc78fcf8fdc/id-preview-11b70679--bba4bb75-68d4-4ba0-ac78-e8ee003deb73.lovable.app-1781607021304.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
