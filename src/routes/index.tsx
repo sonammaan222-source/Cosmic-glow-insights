@@ -204,32 +204,17 @@ function Contact() {
           </div>
         </div>
         <form
-          onSubmit={async (e) => {
+          onSubmit={(e) => {
             e.preventDefault();
             const data = new FormData(e.currentTarget);
-            const email = data.get("email") as string;
-            const message = data.get("message") as string;
-            const name = data.get("name") as string;
-            if (!email || !message) {
+            if (!data.get("email") || !data.get("message")) {
               toast.error("Please add an email and a message.");
               return;
             }
-            try {
-              await fetch(
-                "https://sonammaan-23.app.n8n.cloud/webhook-test/c27b0f45-bbde-43c8-8daa-c6ba66e5b2c7",
-                {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ name, email, message }),
-                }
-              );
-              setSent(true);
-              toast.success("Message received — the stars will reply soon.");
-              (e.target as HTMLFormElement).reset();
-              setTimeout(() => setSent(false), 3000);
-            } catch {
-              toast.error("Something went wrong. Please try again.");
-            }
+            setSent(true);
+            toast.success("Message received — the stars will reply soon.");
+            (e.target as HTMLFormElement).reset();
+            setTimeout(() => setSent(false), 3000);
           }}
           className="glass space-y-3 rounded-2xl p-6"
         >
