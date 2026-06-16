@@ -189,6 +189,7 @@ function FAQ() {
 
 function Contact() {
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
   return (
     <section id="contact" className="scroll-mt-24 px-6 py-20">
       <div className="mx-auto grid max-w-5xl gap-10 md:grid-cols-2">
@@ -204,17 +205,42 @@ function Contact() {
           </div>
         </div>
         <form
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault();
-            const data = new FormData(e.currentTarget);
-            if (!data.get("email") || !data.get("message")) {
+            const form = e.currentTarget;
+            const data = new FormData(form);
+            const email = data.get("email") as string;
+            const message = data.get("message") as string;
+            if (!email || !message) {
               toast.error("Please add an email and a message.");
               return;
             }
-            setSent(true);
-            toast.success("Message received — the stars will reply soon.");
-            (e.target as HTMLFormElement).reset();
-            setTimeout(() => setSent(false), 3000);
+            setSending(true);
+            try {
+              const payload = {
+                name: data.get("name") || "",
+                email,
+                subject: data.get("subject") || "",
+                message,
+              };
+              const res = await fetch(
+                "https://sonammaan-23.app.n8n.cloud/webhook-test/c27b0f45-bbde-43c8-8daa-c6ba66e5b2c7",
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(payload),
+                }
+              );
+              if (!res.ok) throw new Error(`Webhook returned ${res.status}`);
+              setSent(true);
+              toast.success("Message received — the stars will reply soon.");
+              form.reset();
+              setTimeout(() => setSent(false), 3000);
+            } catch {
+              toast.error("Failed to send message. Please try again later.");
+            } finally {
+              setSending(false);
+            }
           }}
           className="glass space-y-3 rounded-2xl p-6"
         >
@@ -224,9 +250,16 @@ function Contact() {
           <Textarea name="message" placeholder="Your message…" className="min-h-32 bg-transparent" required />
           <button
             type="submit"
-            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[image:var(--gradient-gold)] px-5 py-3 text-sm font-semibold tracking-wider text-primary-foreground shadow-[var(--shadow-glow-gold)] transition hover:scale-[1.02]"
+            disabled={sending}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[image:var(--gradient-gold)] px-5 py-3 text-sm font-semibold tracking-wider text-primary-foreground shadow-[var(--shadow-glow-gold)] transition hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            {sent ? <><Check className="h-4 w-4" /> SENT</> : <><Send className="h-4 w-4" /> SEND MESSAGE</>}
+            {sending ? (
+              <>SENDING…</>
+            ) : sent ? (
+              <><Check className="h-4 w-4" /> SENT</>
+            ) : (
+              <><Send className="h-4 w-4" /> SEND MESSAGE</>
+            )}
           </button>
         </form>
       </div>
