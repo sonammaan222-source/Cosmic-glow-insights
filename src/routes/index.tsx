@@ -226,7 +226,7 @@ function Contact() {
                 message,
               };
               const res = await fetch(
-                "https://sonammaan-23.app.n8n.cloud/webhook-test/c27b0f45-bbde-43c8-8daa-c6ba66e5b2c7",
+                "https://sonammaan-23.app.n8n.cloud/webhook/c27b0f45-bbde-43c8-8daa-c6ba66e5b2c7",
                 {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
