@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import {
-  Sparkles, Stars, Moon, Sun, Compass, Heart, Flame, Send, Check,
+  Sparkles, Stars, Moon, Sun, Compass, Heart, Flame, Send, Check, X,
 } from "lucide-react";
 import { Starfield } from "@/components/Starfield";
 import { ZodiacWheel } from "@/components/ZodiacWheel";
@@ -190,6 +190,7 @@ function FAQ() {
 function Contact() {
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
+  const [webhookResponse, setWebhookResponse] = useState<unknown>(null);
   return (
     <section id="contact" className="scroll-mt-24 px-6 py-20">
       <div className="mx-auto grid max-w-5xl gap-10 md:grid-cols-2">
@@ -216,6 +217,7 @@ function Contact() {
               return;
             }
             setSending(true);
+            setWebhookResponse(null);
             try {
               const payload = {
                 name: data.get("name") || "",
@@ -232,6 +234,14 @@ function Contact() {
                 }
               );
               if (!res.ok) throw new Error(`Webhook returned ${res.status}`);
+              const text = await res.text();
+              let responseData: unknown;
+              try {
+                responseData = JSON.parse(text);
+              } catch {
+                responseData = text;
+              }
+              setWebhookResponse(responseData);
               setSent(true);
               toast.success("Message received — the stars will reply soon.");
               form.reset();
@@ -263,6 +273,67 @@ function Contact() {
           </button>
         </form>
       </div>
+
+      {webhookResponse !== null && (
+        <div className="mx-auto mt-10 max-w-5xl animate-reveal">
+          <div className="glass relative rounded-2xl border border-gold/20 p-6 md:p-8">
+            <button
+              onClick={() => setWebhookResponse(null)}
+              className="absolute top-4 right-4 inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition hover:bg-white/10 hover:text-foreground"
+              aria-label="Dismiss response"
+            >
+              <X className="h-4 w-4" />
+            </button>
+            <div className="mb-4 flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-gold" />
+              <h3 className="font-display text-lg text-gold">Cosmic Response</h3>
+            </div>
+            <WebhookResponseDisplay data={webhookResponse} />
+          </div>
+        </div>
+      )}
     </section>
   );
+}
+
+function WebhookResponseDisplay({ data }: { data: unknown }) {
+  if (typeof data === "string") {
+    return <p className="text-sm leading-relaxed text-foreground/90">{data}</p>;
+  }
+  if (typeof data === "number" || typeof data === "boolean") {
+    return <p className="text-sm font-medium text-foreground/90">{String(data)}</p>;
+  }
+  if (Array.isArray(data)) {
+    if (data.length === 0) return <p className="text-sm text-muted-foreground">Empty list</p>;
+    return (
+      <ul className="space-y-2">
+        {data.map((item, i) => (
+          <li key={i} className="rounded-lg bg-white/5 p-3">
+            <WebhookResponseDisplay data={item} />
+          </li>
+        ))}
+      </ul>
+    );
+  }
+  if (typeof data === "object" && data !== null) {
+    const entries = Object.entries(data);
+    if (entries.length === 0) return <p className="text-sm text-muted-foreground">Empty object</p>;
+    return (
+      <div className="space-y-3">
+        {entries.map(([key, value]) => (
+          <div key={key} className="rounded-lg bg-white/5 p-3">
+            <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-gold">{key}</p>
+            {typeof value === "string" || typeof value === "number" || typeof value === "boolean" ? (
+              <p className="text-sm text-foreground/90">{String(value)}</p>
+            ) : (
+              <div className="mt-1 border-l border-white/10 pl-3">
+                <WebhookResponseDisplay data={value} />
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  }
+  return <p className="text-sm text-foreground/90">{String(data)}</p>;
 }
